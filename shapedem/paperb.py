@@ -342,6 +342,7 @@ def write_paperb_tables(cfg):
         mac("EndoDtwoPrevFrac", f"{d2:.2f}"),
         mac("EndoDtwoAUCci", _ci_macro(d2cv)),
         mac("EndoDoneAUCci", _ci_macro(endo.get("within_D1_cv", {}))),
+        mac("EndoTransferAUCci", _ci_macro(endo.get("site_D1_to_D2", {}))),
         mac("EndoDoneAUCstd", f"{endo.get('within_D1_cv', {}).get('auc_std', float('nan')):.3f}"),
         mac("EndoDtwoPRauc", f"{d2cv.get('pr_auc', float('nan')):.3f}"),
         mac("EndoDtwoBacc", f"{d2cv.get('balanced_acc', float('nan')):.2f}"),
