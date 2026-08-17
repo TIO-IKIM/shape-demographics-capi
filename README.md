@@ -18,8 +18,7 @@ Pelvic Imaging (CAPI) and Women's Health (WOMEN) workshop at MICCAI 2026
 > download script to populate them. Pre-computed results are already in
 > `experiments/`.
 
-The camera-ready manuscript will be added to `paper/` once the MICCAI 2026
-Satellite Events proceedings are finalized.
+The manuscript is included in [`paper/`](paper/).
 
 If you find this work useful, please cite:
 
