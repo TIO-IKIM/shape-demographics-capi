@@ -1,0 +1,11 @@
+.venv/
+__pycache__/
+*.pyc
+.DS_Store
+*.egg-info/
+.pytest_cache/
+_workspace/data/
+_workspace/features/
+_workspace/work/
+_workspace/cache/
+_workspace/example_output/

@@ -1,0 +1,22 @@
+name: shapedem
+channels:
+  - conda-forge
+dependencies:
+  - python=3.11
+  - numpy
+  - scipy
+  - pandas
+  - scikit-learn
+  - scikit-image
+  - nibabel
+  - simpleitk
+  - trimesh
+  - xgboost
+  - matplotlib
+  - seaborn
+  - pyyaml
+  - tqdm
+  - requests
+  - pip
+  - pip:
+      - remotezip

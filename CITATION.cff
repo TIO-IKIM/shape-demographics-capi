@@ -1,0 +1,48 @@
+cff-version: 1.2.0
+message: "If you use this code, please cite the paper below."
+title: "A Multi-Site Label Trap in Shape-Based Endometriosis Detection"
+authors:
+  - family-names: Luijten
+    given-names: Gijs
+    orcid: "https://orcid.org/0009-0000-3404-1917"
+  - family-names: Engelke
+    given-names: Merlin
+    orcid: "https://orcid.org/0000-0002-8463-8786"
+  - family-names: Ruppel
+    given-names: Richard
+    orcid: "https://orcid.org/0009-0002-7081-0300"
+  - family-names: Egger
+    given-names: Jan
+    orcid: "https://orcid.org/0000-0002-5225-1982"
+version: 0.1.0
+license: MIT
+date-released: 2026-06-27
+preferred-citation:
+  type: conference-paper
+  title: "A Multi-Site Label Trap in Shape-Based Endometriosis Detection: What Female Pelvic-Organ Shape Does (and Does Not) Encode"
+  authors:
+    - family-names: Luijten
+      given-names: Gijs
+      orcid: "https://orcid.org/0009-0000-3404-1917"
+    - family-names: Engelke
+      given-names: Merlin
+      orcid: "https://orcid.org/0000-0002-8463-8786"
+    - family-names: Ruppel
+      given-names: Richard
+      orcid: "https://orcid.org/0009-0002-7081-0300"
+    - family-names: Egger
+      given-names: Jan
+      orcid: "https://orcid.org/0000-0002-5225-1982"
+  conference:
+    name: "CAPI-WOMEN Workshop, held in conjunction with MICCAI 2026"
+  collection-title: "Medical Image Computing and Computer Assisted Intervention -- MICCAI 2026 Satellite Events, Lecture Notes in Computer Science"
+  publisher:
+    name: "Springer Nature Switzerland"
+  year: 2026
+keywords:
+  - endometriosis
+  - pelvic MRI
+  - shape analysis
+  - multi-site bias
+  - label trap
+  - uterine morphology

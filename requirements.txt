@@ -1,0 +1,16 @@
+# pip install -r requirements.txt  (all have prebuilt wheels; no compiler needed)
+numpy
+scipy
+pandas
+scikit-learn
+scikit-image
+nibabel
+SimpleITK
+trimesh
+xgboost
+matplotlib
+seaborn
+pyyaml
+tqdm
+requests
+remotezip
