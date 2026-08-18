@@ -47,6 +47,15 @@ If you find this work useful, please cite:
 
 ![Same model, four evaluations: the label trap at a glance](docs/assets/label_trap.png)
 
+<p>
+<img src="experiments/figures/umd_age.png" width="38%" alt="Age MAE by feature regime with cohort-mean baseline">
+<img src="docs/assets/rater_cov.png" width="60%" alt="Per-descriptor inter-rater CoV strips">
+</p>
+
+*Left: the age signal is size-dominated — shape-only does worse than always predicting the cohort
+mean (dashed line). Right: rater stability per descriptor; the size and shape families interleave,
+so family averages hide the extremes (surface area and volume are the least stable descriptors).*
+
 
 ## The headline number, explained
 

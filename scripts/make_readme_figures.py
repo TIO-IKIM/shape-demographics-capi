@@ -11,6 +11,8 @@ Outputs (docs/assets/):
                       out-of-fold predictions (a "slider" that plays itself,
                       since GitHub READMEs cannot embed interactive controls).
   label_trap.png      the same model under four evaluations, with bootstrap CIs.
+  rater_cov.png       per-descriptor inter-rater CoV strips (subjects as dots),
+                      from experiments/rater_cov_raw.csv.
 
 Requires the UMD zip for the pipeline panel:  bash scripts/download_capi.sh
 The ROC/PR figures only need the committed experiments/ CSV.
@@ -234,6 +236,42 @@ def trap_figure():
     print("[readme] label_trap.png")
 
 
+def rater_cov_figure():
+    df = pd.read_csv(os.path.join(REPO, "experiments", "rater_cov_raw.csv"))
+    df = df[df.family.isin(["size", "shape"])]
+    fam_color = {"size": CORAL, "shape": TEAL}
+    organs = (("ut", "Uterus (25 subjects)"), ("ov", "Ovary (18 subjects)"))
+
+    fig, axes = plt.subplots(1, 2, figsize=(11.5, 4.6), facecolor="white", sharex=True)
+    rng = np.random.default_rng(0)
+    for ax, (st, title) in zip(axes, organs):
+        d = df[df.struct == st]
+        order = d.groupby("feature")["cov"].median().sort_values().index.tolist()
+        for i, feat in enumerate(order):
+            vals = d[d.feature == feat]["cov"].to_numpy()
+            fam = d[d.feature == feat]["family"].iloc[0]
+            ax.scatter(vals, i + rng.uniform(-0.18, 0.18, len(vals)),
+                       s=9, color=fam_color[fam], alpha=0.45, linewidths=0, zorder=3)
+            ax.plot([np.median(vals)] * 2, [i - 0.3, i + 0.3],
+                    color=fam_color[fam], lw=2.4, zorder=4)
+        ax.set_yticks(range(len(order)),
+                      [f.replace("size_", "").replace("shape_", "") for f in order], fontsize=8)
+        ax.set_xscale("log")
+        ax.set_title(title, fontsize=11, color=INK)
+        ax.set_xlabel("inter-rater CoV (log scale; lower = more stable)", fontsize=9, color=INK)
+        style(ax)
+    h1 = axes[0].scatter([], [], color=CORAL, label="size descriptor", s=18)
+    h2 = axes[0].scatter([], [], color=TEAL, label="scale-free shape descriptor", s=18)
+    fig.legend(handles=[h1, h2], loc="upper right", fontsize=9, frameon=False,
+               bbox_to_anchor=(0.99, 0.99))
+    fig.suptitle("Descriptor-level rater stability (dots: subjects, bar: median)",
+                 fontsize=12, color=INK, x=0.35)
+    fig.tight_layout(rect=(0, 0, 1, 0.93))
+    fig.savefig(os.path.join(OUT, "rater_cov.png"), dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print("[readme] rater_cov.png")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-pipeline", action="store_true",
@@ -242,6 +280,7 @@ if __name__ == "__main__":
     os.makedirs(OUT, exist_ok=True)
     threshold_gif()
     trap_figure()
+    rater_cov_figure()
     if not args.skip_pipeline:
         if os.path.exists(os.path.join(ROOT, "data", "UMD.zip")):
             pipeline_figure()
