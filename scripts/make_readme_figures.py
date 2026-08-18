@@ -3,16 +3,14 @@
 
 Outputs (docs/assets/):
   pipeline_umd.png    4-panel pipeline illustration on one UMD subject
-                      (T2 slice -> segmentation overlay -> marching-cubes
+                      (T2 slice -> label overlay -> raw marching-cubes
                       mesh -> 2,048-point surface cloud). UMD is CC BY 4.0,
                       so showing one subject's slice is license-compatible;
                       UT-EndoMRI imagery is deliberately NOT used here.
-  roc_pr_d2.png       ROC and PR curves for the within-D2 endometrioma
-                      result, from the stored out-of-fold predictions in
-                      experiments/endomri_predictions.csv.
-  threshold_sweep.gif animated decision-threshold sweep over the same
-                      predictions (a "slider" that plays itself, since
-                      GitHub READMEs cannot embed interactive controls).
+  threshold_sweep.gif animated ROC/PR decision-threshold sweep over the stored
+                      out-of-fold predictions (a "slider" that plays itself,
+                      since GitHub READMEs cannot embed interactive controls).
+  label_trap.png      the same model under four evaluations, with bootstrap CIs.
 
 Requires the UMD zip for the pipeline panel:  bash scripts/download_capi.sh
 The ROC/PR figures only need the committed experiments/ CSV.
@@ -157,34 +155,6 @@ def style(ax):
     for s in ("top", "right"):
         ax.spines[s].set_visible(False)
     ax.tick_params(colors=INK, labelsize=9)
-
-
-def roc_pr_figure():
-    y, p = load_d2()
-    (fpr, tpr, _, auc), (prec, rec, _, ap) = curve_axes(y, p)
-    prev = y.mean()
-
-    fig, (a1, a2) = plt.subplots(1, 2, figsize=(9.6, 4.1), facecolor="white")
-    a1.plot(fpr, tpr, color=TEAL, lw=2)
-    a1.plot([0, 1], [0, 1], color=GRAY, lw=1.4, ls="--")
-    a1.text(0.55, 0.50, "random ranking (AUC 0.5)", color=GRAY, fontsize=9, rotation=38)
-    a1.set_xlabel("false-positive rate", fontsize=10, color=INK)
-    a1.set_ylabel("true-positive rate (sensitivity)", fontsize=10, color=INK)
-    a1.set_title(f"ROC — within-site D2 (AUC {auc:.2f})", fontsize=11, color=INK)
-
-    a2.plot(rec, prec, color=TEAL, lw=2)
-    a2.axhline(prev, color=GRAY, lw=1.4, ls="--")
-    a2.text(0.03, prev + 0.02, f"random ranking (= prevalence {prev:.2f})", color=GRAY, fontsize=9)
-    a2.set_xlabel("recall (sensitivity)", fontsize=10, color=INK)
-    a2.set_ylabel("precision", fontsize=10, color=INK)
-    a2.set_ylim(0, 1.02)
-    a2.set_title(f"Precision–recall (PR-AUC {ap:.2f})", fontsize=11, color=INK)
-    for ax in (a1, a2):
-        style(ax)
-    fig.tight_layout()
-    fig.savefig(os.path.join(OUT, "roc_pr_d2.png"), dpi=160, bbox_inches="tight")
-    plt.close(fig)
-    print("[readme] roc_pr_d2.png")
 
 
 def threshold_gif():
