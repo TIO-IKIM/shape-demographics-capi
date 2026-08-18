@@ -36,7 +36,9 @@ REPO = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 ROOT = os.environ.get("SHAPEDEM_ROOT", os.path.join(REPO, "_workspace"))
 OUT = os.path.join(REPO, "docs", "assets")
 
-TEAL, INDIGO, CORAL = "#0FA07F", "#6D69E0", "#E25A5A"  # CVD-validated trio
+TEAL, INDIGO, CORAL, AMBER = "#0FA07F", "#6D69E0", "#E25A5A", "#D9A404"
+# palette validated (dataviz six checks); amber's low white-surface contrast and
+# the teal/coral deutan band are covered by direct per-structure text labels
 GRAY, INK = "#868DA8", "#22304a"
 SUBJECT = "UMD_221129_003"  # large corpus and fibroid; representative anatomy
 
@@ -68,19 +70,17 @@ def pipeline_figure():
 
     corpus = (seg == 1) | (seg == 2)
     fibroid = seg == 3
-    # slice maximizing joint corpus+fibroid presence, so both overlays show
-    score = corpus.sum(axis=(0, 1)) + 3 * fibroid.sum(axis=(0, 1))
-    z = int(np.argmax(score))
+    # slice showing the most label types, then the most labeled area
+    present = sum((seg == lab).any(axis=(0, 1)).astype(int) for lab in (1, 2, 3, 4))
+    area = (seg > 0).sum(axis=(0, 1))
+    z = int(np.argmax(present * 10**7 + area))
     sl = vol[z].T if vol.shape[1:] == seg.shape[:2] else vol[z]
     lo, hi = np.percentile(sl, [1, 99])
     sl = np.clip((sl - lo) / (hi - lo), 0, 1)
     sl = np.rot90(sl)  # spine vertical, anterior left: natural sagittal reading
 
-    # marching cubes in mm for the mesh + a uniform 2,048-point surface sample
-    from scipy.ndimage import gaussian_filter
-    # smoothed for the illustration only; the pipeline itself runs on raw masks
-    smooth = gaussian_filter(corpus.astype(float), sigma=(2.5, 2.5, 0.6))
-    verts, faces, _, _ = measure.marching_cubes(smooth, 0.5, spacing=zooms)
+    # raw marching cubes in mm, exactly as the pipeline computes it (no smoothing)
+    verts, faces, _, _ = measure.marching_cubes(corpus.astype(np.uint8), 0.5, spacing=zooms)
     rng = np.random.default_rng(0)
     tri = verts[faces]
     areas = 0.5 * np.linalg.norm(np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]), axis=1)
@@ -102,14 +102,19 @@ def pipeline_figure():
         ax.imshow(sl, cmap="gray", aspect=1/aspect)
         ax.set_title(title, fontsize=11, color=INK)
         ax.axis("off")
-    for mask, color in ((np.rot90(corpus[:, :, z].T), TEAL), (np.rot90(fibroid[:, :, z].T), CORAL)):
+    LABELS = ((1, "uterine wall", TEAL), (3, "fibroid", CORAL),
+              (2, "cavity", INDIGO), (4, "cyst", AMBER))
+    shown = 0
+    for lab, name, color in LABELS:
+        mask = np.rot90((seg[:, :, z] == lab).T)
+        if not mask.any():
+            continue
         rgba = np.zeros((*mask.shape, 4))
-        rgba[mask] = matplotlib.colors.to_rgba(color, 0.45)
+        rgba[mask] = matplotlib.colors.to_rgba(color, 0.5)
         ax2.imshow(rgba, aspect=1/aspect)
-    ax2.text(0.02, 0.02, "uterine corpus", color=TEAL, fontsize=9,
-             transform=ax2.transAxes, fontweight="bold")
-    ax2.text(0.02, 0.09, "fibroid", color=CORAL, fontsize=9,
-             transform=ax2.transAxes, fontweight="bold")
+        ax2.text(0.02, 0.02 + 0.07 * shown, name, color=color, fontsize=9,
+                 transform=ax2.transAxes, fontweight="bold")
+        shown += 1
 
     ax3.plot_trisurf(verts[:, 0], verts[:, 1], faces, verts[:, 2],
                      color=TEAL, linewidth=0, antialiased=True, shade=True)
@@ -117,9 +122,15 @@ def pipeline_figure():
     ax4.scatter(pts[:, 0], pts[:, 1], pts[:, 2], s=1.5, c=INDIGO, alpha=0.8)
     ax4.set_title("d) 2,048-point cloud", fontsize=11, color=INK)
     for ax in (ax3, ax4):
-        ax.set_axis_off()
         ax.view_init(elev=18, azim=-60)
         ax.set_box_aspect(np.ptp(verts, axis=0))
+        for axis in (ax.xaxis, ax.yaxis, ax.zaxis):
+            axis.set_pane_color((0.96, 0.96, 0.97, 1.0))
+            axis.line.set_color(GRAY)
+        ax.tick_params(colors=GRAY, labelsize=7, pad=-2)
+        ax.set_xlabel("mm", fontsize=8, color=GRAY, labelpad=-6)
+        ax.set_ylabel("mm", fontsize=8, color=GRAY, labelpad=-6)
+        ax.set_zlabel("mm", fontsize=8, color=GRAY, labelpad=-6)
 
     fig.tight_layout()
     fig.savefig(os.path.join(OUT, "pipeline_umd.png"), dpi=160, bbox_inches="tight")
@@ -220,14 +231,47 @@ def threshold_gif():
     print("[readme] threshold_sweep.gif")
 
 
+def trap_figure():
+    import json
+    e = json.load(open(os.path.join(REPO, "experiments", "endomri_results.json")))
+    rows = [("Within site D2", e["within_D2_cv"]),
+            ("Pooled 5-fold CV", e["endometrioma_cv"]),
+            ("Within site D1", e["within_D1_cv"]),
+            ("Transfer D1 \u2192 D2", e["site_D1_to_D2"])]
+    names = [r[0] for r in rows]
+    auc = [r[1]["auc"] for r in rows]
+    ci = [r[1]["auc_ci95"] for r in rows]
+
+    fig, ax = plt.subplots(figsize=(8.4, 3.4), facecolor="white")
+    ypos = np.arange(len(rows))[::-1]
+    ax.barh(ypos, auc, height=0.55, color=TEAL, zorder=3)
+    ax.errorbar(auc, ypos,
+                xerr=[[a - c[0] for a, c in zip(auc, ci)], [c[1] - a for a, c in zip(auc, ci)]],
+                fmt="none", ecolor=INK, elinewidth=1.4, capsize=4, zorder=4)
+    ax.axvline(0.5, color=GRAY, lw=1.4, ls="--", zorder=2)
+    ax.text(0.5, len(rows) - 0.42, "random ranking (0.5)", color=GRAY, fontsize=9, ha="center")
+    ax.set_ylim(-0.6, len(rows) - 0.2)
+    for y, a in zip(ypos, auc):
+        ax.text(0.02, y, f"{a:.2f}", va="center", color="white", fontsize=10, fontweight="bold", zorder=5)
+    ax.set_yticks(ypos, names, fontsize=10, color=INK)
+    ax.set_xlim(0, 1)
+    ax.set_xlabel("ROC-AUC (whiskers: bootstrap 95% CI)", fontsize=10, color=INK)
+    ax.set_title("The label trap at a glance: the same model, four evaluations", fontsize=11, color=INK)
+    style(ax)
+    fig.tight_layout()
+    fig.savefig(os.path.join(OUT, "label_trap.png"), dpi=160, bbox_inches="tight")
+    plt.close(fig)
+    print("[readme] label_trap.png")
+
+
 if __name__ == "__main__":
     ap = argparse.ArgumentParser()
     ap.add_argument("--skip-pipeline", action="store_true",
                     help="skip the panel that needs the UMD zip")
     args = ap.parse_args()
     os.makedirs(OUT, exist_ok=True)
-    roc_pr_figure()
     threshold_gif()
+    trap_figure()
     if not args.skip_pipeline:
         if os.path.exists(os.path.join(ROOT, "data", "UMD.zip")):
             pipeline_figure()

@@ -14,9 +14,10 @@ Pelvic Imaging (CAPI) and Women's Health (WOMEN) workshop at MICCAI 2026
 
 ![Pipeline: T2 MRI slice, segmentation overlay, marching-cubes mesh, 2,048-point surface cloud](docs/assets/pipeline_umd.png)
 
-*The pipeline on one UMD subject: a T2 slice, its segmentation (uterine corpus, fibroids), the
-marching-cubes surface, and the 2,048-point cloud the descriptors are computed from. Mesh smoothed
-for illustration only. Imaging: UMD dataset (Pan et al., Scientific Data 2024), CC BY 4.0.*
+*The pipeline on one UMD subject: a T2 slice, the dataset's own multi-label segmentation, the raw
+marching-cubes surface (the 6.6 mm slice spacing is visible as terracing — nothing is smoothed),
+and the 2,048-point cloud the descriptors are computed from. Imaging: UMD dataset (Pan et al.,
+Scientific Data 2024), CC BY 4.0.*
 
 > **Reproducibility contract.** No number in the paper is hand-typed. Every
 > statistic is generated from files in `experiments/` by `shapedem/paperb.py`.
@@ -44,19 +45,18 @@ If you find this work useful, please cite:
 - **Multi-site label trap**: annotation prevalence 78% vs 15% misleads pooled CV (AUC 0.64) and collapses cross-site transfer (AUC 0.27)
 - **Inter-rater robustness**: on family averages, scale-free shape varies less across raters than size (uterus mean CoV 0.117 vs 0.142; ovary 0.147 vs 0.228), though the ordering reverses at the uterus median
 
+![Same model, four evaluations: the label trap at a glance](docs/assets/label_trap.png)
+
 
 ## The headline number, explained
 
 ROC-AUC answers one question: if you draw one annotation-positive and one negative patient at
 random, how often does the model rank the positive one higher? 0.5 is coin-flip ranking. The
 PR curve tells the harsher story under 15% prevalence: precision at each level of recall,
-against a random-ranker baseline equal to the prevalence.
-
-![ROC and precision-recall curves for the within-D2 result](docs/assets/roc_pr_d2.png)
-
-A single AUC hides that every deployment must pick a decision threshold. The sweep below plays
-through that choice on the stored out-of-fold predictions (GitHub READMEs cannot embed an
-interactive slider, so this one drives itself):
+against a random-ranker baseline equal to the prevalence. A single AUC also hides that every
+deployment must pick a decision threshold. The sweep below plays through that choice on the
+stored out-of-fold predictions (GitHub READMEs cannot embed an interactive slider, so this
+one drives itself):
 
 ![Animated decision-threshold sweep](docs/assets/threshold_sweep.gif)
 
