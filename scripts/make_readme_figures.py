@@ -77,7 +77,7 @@ def pipeline_figure():
     sl = vol[z].T if vol.shape[1:] == seg.shape[:2] else vol[z]
     lo, hi = np.percentile(sl, [1, 99])
     sl = np.clip((sl - lo) / (hi - lo), 0, 1)
-    sl = np.rot90(sl)  # spine vertical, anterior left: natural sagittal reading
+    sl = np.rot90(sl, 3)  # head up, natural sagittal reading
 
     # raw marching cubes in mm, exactly as the pipeline computes it (no smoothing)
     verts, faces, _, _ = measure.marching_cubes(corpus.astype(np.uint8), 0.5, spacing=zooms)
@@ -106,7 +106,7 @@ def pipeline_figure():
               (2, "cavity", INDIGO), (4, "cyst", AMBER))
     shown = 0
     for lab, name, color in LABELS:
-        mask = np.rot90((seg[:, :, z] == lab).T)
+        mask = np.rot90((seg[:, :, z] == lab).T, 3)
         if not mask.any():
             continue
         rgba = np.zeros((*mask.shape, 4))
