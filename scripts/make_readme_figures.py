@@ -81,6 +81,7 @@ def pipeline_figure():
 
     # raw marching cubes in mm, exactly as the pipeline computes it (no smoothing)
     verts, faces, _, _ = measure.marching_cubes(corpus.astype(np.uint8), 0.5, spacing=zooms)
+    verts = verts - verts.min(axis=0)  # axes read organ extents in mm, not scanner position
     rng = np.random.default_rng(0)
     tri = verts[faces]
     areas = 0.5 * np.linalg.norm(np.cross(tri[:, 1] - tri[:, 0], tri[:, 2] - tri[:, 0]), axis=1)
