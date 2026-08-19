@@ -218,6 +218,17 @@ criticism of either dataset's annotation protocol.
 
 ---
 
+## Funding
+
+This publication was partially funded by the German Federal Ministry of Research,
+Technology and Space (BMFTR) Network of University Medicine 3.0: "NUM 3.0",
+Grant No. 01KX2524, Project: RACOON.
+
+This research was supported by the REACT-EU project KITE (grant number
+EFRE-2920801977, Plattform für KI-Translation Essen, https://kite.ikim.nrw/).
+
+---
+
 ## Use of Large Language Models
 
 Large language models were used to assist with literature search, code
