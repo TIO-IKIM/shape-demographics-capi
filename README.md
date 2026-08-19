@@ -26,7 +26,8 @@ Scientific Data 2024), CC BY 4.0.*
 > download script to populate them. Pre-computed results are already in
 > `experiments/`.
 
-The manuscript is included in [`paper/`](paper/).
+The manuscript is included in [`paper/`](paper/) and the conference poster
+(A0 PDF) in [`poster/`](poster/).
 
 If you find this work useful, please cite:
 
