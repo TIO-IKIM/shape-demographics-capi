@@ -221,9 +221,11 @@ def trap_figure():
     ax.errorbar(auc, ypos,
                 xerr=[[a - c[0] for a, c in zip(auc, ci)], [c[1] - a for a, c in zip(auc, ci)]],
                 fmt="none", ecolor=INK, elinewidth=1.4, capsize=4, zorder=4)
-    ax.axvline(0.5, color=GRAY, lw=1.4, ls="--", zorder=2)
-    ax.text(0.5, len(rows) - 0.42, "random ranking (0.5)", color=GRAY, fontsize=9, ha="center")
-    ax.set_ylim(-0.6, len(rows) - 0.2)
+    # the dashed line stops below its own label so the two never overlap
+    ax.axvline(0.5, ymax=0.94, color=GRAY, lw=1.4, ls="--", zorder=2)
+    ax.text(0.5, len(rows) - 0.26, "random ranking (0.5)", color=GRAY, fontsize=9,
+            ha="center", va="center")
+    ax.set_ylim(-0.6, len(rows) - 0.05)
     for y, a in zip(ypos, auc):
         ax.text(0.02, y, f"{a:.2f}", va="center", color="white", fontsize=10, fontweight="bold", zorder=5)
     ax.set_yticks(ypos, names, fontsize=10, color=INK)
