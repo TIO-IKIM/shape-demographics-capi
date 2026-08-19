@@ -107,7 +107,7 @@ def pipeline_figure():
               (2, "cavity", INDIGO), (4, "cyst", AMBER))
     shown = 0
     for lab, name, color in LABELS:
-        mask = np.rot90((seg[:, :, z] == lab).T, 3)
+        mask = np.rot90(seg[:, :, z] == lab, 3)
         if not mask.any():
             continue
         rgba = np.zeros((*mask.shape, 4))
