@@ -26,8 +26,11 @@ Scientific Data 2024), CC BY 4.0.*
 > download script to populate them. Pre-computed results are already in
 > `experiments/`.
 
-The manuscript is included in [`paper/`](paper/) and the conference poster
-(A0 PDF) in [`poster/`](poster/).
+The paper PDF is not hosted here yet: publication is governed by a Springer
+Nature licence to publish, which sets when each version of the contribution may
+be made public. See [`paper/`](paper/) for the details and for how to request a
+copy in the meantime. The conference poster (A0 PDF) is in
+[`poster/`](poster/).
 
 If you find this work useful, please cite:
 
